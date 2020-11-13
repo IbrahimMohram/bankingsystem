@@ -18,6 +18,8 @@
 #include "employee.h"
 #include "admin.h"
 
+#define NEWLINE "cout << endl"
+
 class Ui {
 	
 private:

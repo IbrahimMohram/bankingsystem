@@ -290,6 +290,13 @@ Employee* Session::getEmployee(const string username) {
 	return emp;
 }
 
+Account* Session::getAccount(const int accountid) {
+	Account *acct = m_db->retrieveAccount(accountid);
+	if (!acct)
+		return nullptr;
+	return acct;
+}
+
 Admin* Session::getAdmin(const string username) {
 	Admin *admin = dynamic_cast<Admin*>(getPerson(username));
 	if (!admin)
@@ -309,4 +316,18 @@ int Session::genUserId() {
 
 int Session::genAccountId() {
 	return m_db->generateAccountNumber();
+}
+
+Customer* Session::getCustomerByAccount(const int accountid) {
+	Customer *cust = m_db->retrieveCustomerByAccount(accountid);
+	if (!cust)
+		return nullptr;
+	return cust;
+}
+
+Account* Session::getAccountByCustomer(const int customerid) {
+	Account *acct = m_db->retrieveAccountByCustomer(customerid);
+	if (!acct)
+		return nullptr;
+	return acct;
 }

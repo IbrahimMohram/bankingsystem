@@ -4,10 +4,12 @@
  *  Created on: Nov 6, 2020
  *      Author: Amira
  */
-
-
 #include "session.h"
 #include "userinterface.h"
+
+/*
+ * Session methods
+ * */
 
 bool Session::withdraw(const int sum) {
 
@@ -105,6 +107,9 @@ bool Session::printAccountInfo() {
 	return true;
 }
 
+/*
+ * User interface methods
+ * */
 
 void Ui::ui_transfer_own() {
 }

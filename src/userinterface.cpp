@@ -12,8 +12,8 @@
 #include <unistd.h>
 #endif
 #include <string>
-#include "userinterface.h"
 #include <limits>
+#include "userinterface.h"
 
 Ui::Ui() : m_session(nullptr), m_execute(nullptr){
 	m_capMap.clear();
@@ -228,14 +228,16 @@ int Ui::run() {
 	string username, password;
 	int operation;
 
-	cout << "User: ";
-	cin >> username;
-	password = string(getpass("Password: "));
+	if (!m_session->isLoggedIn()) {
+		cout << "User: ";
+		cin >> username;
+		password = string(getpass("Password: "));
 
-	bool loggedIn = m_session->login(username, password);
-	if (!loggedIn) {
-		cerr << "Login Failed" << endl;
-		run();
+		bool loggedIn = m_session->login(username, password);
+		if (!loggedIn) {
+			cerr << "Login Failed" << endl;
+			run();
+		}
 	}
 
 	m_capabilitiesLabels = m_session->getSessionCapabilities();
@@ -253,9 +255,11 @@ int Ui::run() {
 	cout << endl;
 	cout << endl;
 
+	map<int, string>::iterator it;
+
 	for (;;) {
 		operation = 0;
-		map<int, string>::iterator it;
+		//map<int, string>::iterator it;
 
 		do { //FIXME: Infinit loop or crash when string is entered
 			cout << "Select Operation: ";

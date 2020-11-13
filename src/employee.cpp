@@ -2,11 +2,14 @@
  * employee.cpp
  *
  *  Created on: Nov 3, 2020
- *      Author: khaled
+ *      Author: amira
  */
 
 #include <assert.h>
 #include <typeinfo>
+#ifdef __linux__
+#include <unistd.h>
+#endif
 #include "session.h"
 #include "userinterface.h"
 
@@ -18,7 +21,10 @@ bool Session::createAccount(Account *acct) {
 	if (!isAuthorized(Session::ACCOUNT_CREATE))
 		return false;
 
-	assert(typeid(*acct) == typeid(Account));
+	if (typeid(*acct) != typeid(Account))
+		return false;
+
+
 	if (!acct || m_db->retrieveAccount(acct->getId()))
 			return false;
 
@@ -34,7 +40,9 @@ bool Session::deleteAccount(Account *acct) {
 	if (!isAuthorized(Session::ACCOUNT_DELETE))
 		return false;
 
-	assert(typeid(*acct) == typeid(Account));
+	if (typeid(*acct) != typeid(Account))
+		return false;
+
 	if (!acct || m_db->retrieveAccount(acct->getId()))
 		return false;
 
@@ -50,7 +58,9 @@ bool Session::updateAccount(Account *acct) {
 	if (!isAuthorized(Session::ACCOUNT_UPDATE))
 		return false;
 
-	assert(typeid(*acct) == typeid(Account));
+	if (typeid(*acct) != typeid(Account))
+		return false;
+
 	if (!acct || !m_db->deleteAccount(acct))
 		return false;
 	else
@@ -64,7 +74,8 @@ bool Session::deactivateAccount(Account *acct) {
 		return false;
 
 
-	assert(typeid(*acct) == typeid(Account));
+	if (typeid(*acct) != typeid(Account))
+		return false;
 
 	if (!acct)
 		return false;
@@ -83,7 +94,9 @@ bool Session::activateAccount(Account *acct) {
 	if (!isAuthorized(Session::ACCOUNT_ACTIVATE))
 		return false;
 
-	assert(typeid(*acct) == typeid(Account));
+	if (typeid(*acct) != typeid(Account))
+		return false;
+
 	if (!acct)
 		return false;
 
@@ -101,7 +114,9 @@ bool Session::printAccountInfo(Account *acct) {
 	if (!isAuthorized(Session::ACCOUNT_PRINT_INFO))
 		return false;
 
-	assert(typeid(*acct) == typeid(Account));
+	if (typeid(*acct) != typeid(Account))
+		return false;
+
 	if (!acct)
 		return false;
 
@@ -114,7 +129,9 @@ bool Session::createCustomer(Customer *customer) {
 	if (!isAuthorized(Session::CUSTOMER_CREATE))
 		return false;
 
-	assert(typeid(*customer) == typeid(Customer));
+	if (typeid(*customer) != typeid(Customer))
+		return false;
+
 	if (!customer || m_db->retrievePerson(customer->getUserName()))
 			return false;
 
@@ -130,7 +147,9 @@ bool Session::updateCustomer(Customer *customer) {
 	if (!isAuthorized(Session::CUSTOMER_UPDATE))
 		return false;
 
-	assert(typeid(*customer) == typeid(Customer));
+	if (typeid(*customer) != typeid(Customer))
+		return false;
+
 	if (!customer)
 		return false;
 	else {
@@ -151,7 +170,9 @@ bool Session::deleteCustomer(Customer *customer) {
 	if (!isAuthorized(Session::CUSTOMER_DELETE))
 		return false;
 
-	assert(typeid(*customer) == typeid(Customer));
+	if (typeid(*customer) != typeid(Customer))
+		return false;
+
 	if (!customer)
 		return false;
 	else {
@@ -168,12 +189,14 @@ bool Session::deleteCustomer(Customer *customer) {
 	return false;
 }
 
-bool Session::printCustomerInfo(Customer *cust) {
+bool Session::printCustomerInfo(Customer *customer) {
 	if (!isAuthorized(Session::CUSTOMER_PRINT_INFO))
 		return false;
 
-	assert(typeid(*cust) == typeid(Customer));
-	if (!cust)
+	if (typeid(*customer) != typeid(Customer))
+		return false;
+
+	if (!customer)
 		return false;
 
 	// TODO: Implement the printing here
@@ -238,7 +261,9 @@ bool Session::transfer(Account *from, Account *to, const int sum) {
 
 bool Session::deposit(Account *acct, const int sum) {
 
-	assert(typeid(*acct) == typeid(Account));
+	if (typeid(*acct) != typeid(Account))
+		return false;
+
 	if (!acct)
 		return false;
 
@@ -252,15 +277,121 @@ bool Session::deposit(Account *acct, const int sum) {
 }
 
 
-
 /*
  * User interface methods
  * */
 
 void Ui::ui_create_customer() {
+
+	string username;
+	string firstname;
+	string lastname;
+	string nationalid;
+	string password;
+	string password_confirm;
+	int accountid;
+
+	// TODO: Ask the employee is the account is already created for the customer to be created
+
+	cout << "Registering a new customer" << endl;
+	cout << endl;
+
+	Customer *tmp = new Customer();
+	tmp->setId(m_session->genUserId());
+
+	cout << "User name: ";
+	cin >> username;
+	cout << "First name: ";
+	cin >> firstname;
+	cout << "Last name: ";
+	cin >> lastname;
+
+	cout << "National ID: ";
+	cin >> nationalid;
+	cout <<  endl;
+
+	do {
+		password = string(getpass("Password: "));
+		cout <<  endl;
+		password_confirm = string(getpass("Confirm Password: "));
+		if (password != password_confirm)
+			cerr << "Password mismatch, Please try again" << endl;
+	}
+	while (password != password_confirm);
+
+	tmp->setUserName(username);
+	tmp->setFirstName(firstname);
+	tmp->setLastName(lastname);
+	tmp->setNationalId(nationalid);
+	tmp->setPassword(m_session->encrypt(password));
+
+	tmp->lock();
+
+	cout << "Enter Account number: ";
+	cin >> accountid;
+
+	Account *acct = m_session->getAccount(accountid);
+	if (!acct){
+		cerr << "No such account" << endl;
+		exit(-1);
+	}
+
+	tmp->setAccount(acct);
+
+	if(!m_session->createCustomer(tmp)) {
+		cerr << "Error creating the customer please contact the an  administrator" << endl;
+		run();
+	}
+	else {
+		cout << "Customer was created successfully, please login to continue working" << endl;
+		delete tmp;
+	}
+
 }
 
 void Ui::ui_update_customer() {
+	string username;
+		string firstname;
+		string lastname;
+		string nationalid;
+		string password;
+		string password_confirm;
+
+		Customer *tmp;
+
+		cout << "Updating a Customer" << endl;
+		cout << endl;
+
+		do {
+			cout << "Customer user name: ";
+			cin >> username;
+			tmp = m_session->getCustomer(username);
+			if (!tmp)
+				cerr << "Customer account doesn't exit" << endl;
+		} while (!tmp);
+
+
+		cout << "First name: ";
+		cin >> firstname;
+		cout << "Last name: ";
+		cin >> lastname;
+		cout << "National ID: ";
+		cin >> nationalid;
+		cout <<  endl;
+
+		tmp->setFirstName(firstname);
+		tmp->setLastName(lastname);
+		tmp->setNationalId(nationalid);
+
+		tmp->isLocked() ? tmp->lock() : tmp->unlock();
+
+		if(!m_session->updateCustomer(tmp)) {
+			cerr << "Error updating " << username <<  " please contact the super admin" << endl;
+			run();
+		}
+		else {
+			cout << "Customer was updated successfully, please login to continue working" << endl;
+		}
 }
 
 void Ui::ui_delete_customer() {
@@ -281,9 +412,47 @@ void Ui::ui_delete_customer() {
 }
 
 void Ui::ui_activate_customer() {
+	string username;
+	Customer *tmp;
+
+	do {
+		cout << "Customer username: ";
+		cin >> username;
+		tmp = m_session->getCustomer(username);
+		if (!tmp)
+			cerr << "Customer account doesn't exit" << endl;
+	} while (!tmp);
+
+	tmp->unlock();
+
+	if (!m_session->updateCustomer(tmp)){
+		cerr << "Error activating " << username <<  " please contact the an Administrator" << endl;
+		run();
+	}
+	else
+		cout << "Customer was activated successfully, please login to continue working" << endl;
 }
 
 void Ui::ui_deactivate_customer() {
+	string username;
+	Customer *tmp;
+
+	do {
+		cout << "Customer username: ";
+		cin >> username;
+		tmp = m_session->getCustomer(username);
+		if (!tmp)
+			cerr << "Customer account doesn't exit" << endl;
+	} while (!tmp);
+
+	tmp->unlock();
+
+	if (!m_session->updateCustomer(tmp)){
+		cerr << "Error activating " << username <<  " please contact the an Administrator" << endl;
+		run();
+	}
+	else
+		cout << "Customer was deactivated successfully" << endl;
 }
 
 void Ui::ui_print_customer() {
@@ -293,18 +462,113 @@ void Ui::ui_listall_customer() {
 }
 
 void Ui::ui_create_account() {
+	Account *acct = new Account();
+	acct->setId(m_session->genAccountId());
+	string customer_name = "";
+	cout << "Enter customer name: ";
+	cin >> customer_name;
+	Customer *cust = m_session->getCustomer(customer_name);
+	if (!cust) {
+		cerr << "No such customer" << endl;
+		exit(-1);
+	}
+
+	acct->setCustomerId(cust->getId());
+	acct->setBalance(0);
+
+	if (!m_session->createAccount(acct)){
+		cerr << "Error creating an account" << endl;
+		run();
+	}
+	else {
+		cout << "Account " << acct->getId() << " created successfully" << endl;
+		delete acct;
+	}
 }
 
 void Ui::ui_update_account() {
+
+	int account_number;
+	cout << "Enter account number: ";
+	cin >> account_number;
+
+	Account *acct = m_session->getAccount(account_number);
+
+	if (!m_session->createAccount(acct)){
+		cerr << "Error creating an account" << endl;
+		run();
+	}
+	else {
+		cout << "Account created successfully" << endl;
+		delete acct;
+	}
 }
 
 void Ui::ui_delete_account() {
+	int account_number;
+	cout << "Enter Account Number: ";
+	cin >> account_number;
+
+	Customer *cust = m_session->getCustomerByAccount(account_number);
+	if (!cust) {
+		Account *tmp = m_session->getAccount(account_number);
+		if (!tmp) {
+			cout << "No such account" << endl;
+		} else {
+			if (!m_session->deleteAccount(tmp)) {
+				cerr << "Error deleting account" << endl;
+				exit(-1);
+			} else {
+				cout << "Account deleted Successfully" << endl;
+			}
+		}
+	} else {
+		cerr << "Can't delete account, Account is associated with a customer"
+				<< endl;
+		run();
+	}
 }
 
 void Ui::ui_activate_account() {
+	int account_number;
+	cout << "Enter Account Number: ";
+	cin >> account_number;
+
+	Account *acct = m_session->getAccount(account_number);
+	if (!acct){
+		cerr << "No such account" <<endl;
+		exit(-1);
+	}
+
+	acct->unlock();
+
+	if (!m_session->updateAccount(acct)) {
+		cerr << "Failed to activate account" << endl;
+		run();
+	}
+	else
+		cout << "Account activated succesfully" << endl;
 }
 
 void Ui::ui_deactivate_account() {
+	int account_number;
+	cout << "Enter Account Number: ";
+	cin >> account_number;
+
+	Account *acct = m_session->getAccount(account_number);
+	if (!acct){
+		cerr << "No such account" <<endl;
+		exit(-1);
+	}
+
+	acct->lock();
+
+	if (!m_session->updateAccount(acct)) {
+		cerr << "Failed to deactivate account" << endl;
+		run();
+	}
+	else
+		cout << "Account deactivated succesfully" << endl;
 }
 
 void Ui::ui_print_account() {

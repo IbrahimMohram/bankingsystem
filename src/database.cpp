@@ -839,7 +839,7 @@ int Database::generatePersonNumber() {
 	return maxid+1;
 }
 
-vector<Person*> Database::getAllPersons(int person_type) {
+vector<Person*> Database::getAllPersons(const int person_type) {
 
 	const char *zErrMsg = nullptr;
 	int rc;
@@ -1003,4 +1003,81 @@ int Database::getUsersCount() {
 	sqlite3_exec(db, "END TRANSACTION;", NULL, NULL, NULL);
 
 	return total;
+}
+
+Customer* Database::retrieveCustomerByAccount(const int accountid) const {
+
+	const char *zErrMsg = nullptr;
+	int rc;
+	string sql;
+	sqlite3_stmt *stmt = nullptr;
+	int userid = 0;
+	string uname = "";
+	string fname = "";
+	string lname = "";
+	string natid = "";
+	string password = "";
+	int usertype = 0;
+	int lockstatus = 0;
+	int caps = 0;
+
+	//rc = sqlite3_exec(db, "BEGIN TRANSACTION;", NULL, NULL, NULL);
+	//assert(rc == SQLITE_OK);
+
+	sql = "SELECT * from PERSONS WHERE ID = (SELECT ID FROM ACCOUNTS WHERE OWNER = ?);";
+	rc = sqlite3_prepare_v2(db, sql.c_str(), sql.length(), &stmt, &zErrMsg);
+	if (SQLITE_OK != rc) {
+		cerr << "Can't prepare select statment " << sql.c_str() << " " << rc
+				<< " " << sqlite3_errmsg(db) << endl;
+		sqlite3_close(db);
+		return nullptr;
+	}
+
+	rc = sqlite3_bind_int64(stmt, 1, accountid);
+	if (SQLITE_OK != rc) {
+		cerr << "Error binding value in select " << rc << " "
+				<< sqlite3_errmsg(db) << endl;
+		sqlite3_close(db);
+		return nullptr;
+	}
+
+	int step = sqlite3_step(stmt);
+	if (step == SQLITE_ROW) {
+		userid = sqlite3_column_int(stmt, USERID);
+		uname = string(
+				reinterpret_cast<const char*>(sqlite3_column_text(stmt,
+						USERNAME)));
+		fname = string(
+				reinterpret_cast<const char*>(sqlite3_column_text(stmt,
+						FIRSTNAME)));
+		lname = string(
+				reinterpret_cast<const char*>(sqlite3_column_text(stmt,
+						LASTNAME)));
+		natid = string(
+				reinterpret_cast<const char*>(sqlite3_column_text(stmt,
+						NATIONALID)));
+		password = string(
+				reinterpret_cast<const char*>(sqlite3_column_text(stmt,
+						PASSWORD)));
+		usertype = sqlite3_column_int(stmt, USERTYPE);
+		lockstatus = sqlite3_column_int(stmt, USERLOCK);
+		caps = sqlite3_column_int(stmt, USERCAPS);
+	}
+
+	if (usertype == Session::CUSTOMER) {
+		Customer *person = new Customer();
+		person->setId(userid);
+		person->setUserName(uname);
+		person->setFirstName(fname);
+		person->setLastName(lname);
+		person->setNationalId(natid);
+		person->setPassword(password);
+		person->setUserType(usertype);
+		lockstatus ? person->lock() : person->unlock();
+		person->setCaps(caps);
+		sqlite3_finalize(stmt);
+		return person;
+	}
+
+	return nullptr;
 }

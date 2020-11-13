@@ -107,8 +107,12 @@ public:
 	}
 
 	Customer* getCustomer(const string username);
+	Customer* getCustomerByAccount(const int accountid);
 	Employee* getEmployee(const string username);
 	Admin* getAdmin(const string username);
+	Account* getAccount(const int accountid);
+	Account* getAccountByCustomer(const int customerid);
+
 
 	int genUserId();
 	int genAccountId();
