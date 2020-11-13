@@ -92,7 +92,7 @@ bool Session::printCustomerInfo() {
 	ss << "Customer First Name = " << cust->getFirstName() << endl;
 	ss << "Customer Last Name = " << cust->getLastName() << endl;
 	ss << "Customer National ID = " << cust->getNationalId() << endl;
-	ss << "Customer Last Name = " << cust->getLastName() << endl;
+	ss << "Customer account status = " << status << endl;
 
 	this->info = ss.str();
 
@@ -130,6 +130,7 @@ void Ui::ui_withdraw() {
 void Ui::ui_print_own_customer() {
 
 	cout << endl;
+	m_session->printCustomerInfo();
 	cout << m_session->info;
 	m_session->info.clear();
 	cout << endl;

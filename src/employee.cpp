@@ -206,7 +206,7 @@ bool Session::printCustomerInfo(Customer *customer) {
 	ss << "Customer First Name = " << customer->getFirstName() << endl;
 	ss << "Customer Last Name = " << customer->getLastName() << endl;
 	ss << "Customer National ID = " << customer->getNationalId() << endl;
-	ss << "Customer Last Name = " << customer->getLastName() << endl;
+	ss << "Customer status = " << status << endl;
 
 	this->info = ss.str();
 
