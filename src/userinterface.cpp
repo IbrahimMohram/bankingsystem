@@ -109,8 +109,9 @@ void Ui::showWelcomeScreen() {
     cout << endl;
     cout << endl;
 
-    cout << "Version 1.0  ";
-    cout << "Copyright: Amira and my lovely group of fellow developers" << endl;
+    cout << "\t\tVersion: 1.1" << endl;
+    cout << "\t\tCopyright © 2020: Amira and Colleagues" << endl;
+    cout << "\t\tLicense: General Public License V3 <https://www.gnu.org/licenses/gpl-3.0.en.html>";
 
     cout << endl;
     cout << endl;
@@ -251,18 +252,23 @@ int Ui::run() {
 	}
 
 	cout << endl;
+	int strlength = string("Allowed operations for user " + username).length();
+
+	for (int i = 0 ; i < strlength ; i++) cout <<"=";
+	cout << endl;
+	cout << "Allowed operations for user " << username << endl;
+	for (int i = 0 ; i < strlength ; i++) cout <<"=";
+	cout << endl;
+	cout << endl;
 	listWhatToDo();
 	cout << endl;
 	cout << endl;
 
 	map<int, string>::iterator it;
-
 	for (;;) {
 		operation = 0;
-
 		cout << "Select Operation: ";
 		cin >> operation;
-
 		while (1) {
 			if (cin.fail()) {
 				cin.clear();
