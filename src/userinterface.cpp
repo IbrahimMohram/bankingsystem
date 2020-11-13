@@ -13,6 +13,7 @@
 #endif
 #include <string>
 #include <limits>
+#include <csignal>
 #include "userinterface.h"
 
 Ui::Ui() : m_session(nullptr), m_execute(nullptr){
@@ -181,7 +182,7 @@ void Ui::getCallBack(const string desc) {
 		m_execute = std::bind(&Ui::ui_activate_customer, this);
 	if ("Deactivate customer" == desc)
 		m_execute = std::bind(&Ui::ui_deactivate_customer, this);
-	if ("Print my Customer Information" == desc)
+	if ("Print Customer Information" == desc)
 		m_execute = std::bind(&Ui::ui_print_customer, this);
 	if ("List All Customers" == desc)
 		m_execute = std::bind(&Ui::ui_listall_customer, this);

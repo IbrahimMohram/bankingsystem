@@ -159,6 +159,8 @@ public:
 	bool ListAllAdmins();
 	bool ListAllEmployees();
 
+	string info;
+
 };
 
 

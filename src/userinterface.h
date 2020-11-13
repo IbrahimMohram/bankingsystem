@@ -29,8 +29,6 @@ private:
 	void getCallBack(const string desc);
 	map<int,string> m_capMap;
 
-
-
 	void registerSuperAdmin();
 	void showWelcomeScreen();
 	void listWhatToDo();
@@ -82,6 +80,17 @@ public:
 	Ui() ;
 	~Ui();
 	int run();
+
+/*
+private:
+	static Ui *instance;
+	void sighandler(int signum) {run();}
+	static void static_sighandler(int signum) {
+		//Ui::run();
+	}
+
+*/
+
 };
 
 

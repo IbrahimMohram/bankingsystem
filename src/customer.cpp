@@ -4,8 +4,12 @@
  *  Created on: Nov 6, 2020
  *      Author: Amira
  */
+
+#include <sstream>
 #include "session.h"
 #include "userinterface.h"
+
+using namespace std;
 
 /*
  * Session methods
@@ -81,13 +85,16 @@ bool Session::printCustomerInfo() {
 	if (!bIsLoggedIn || !cust)
 		return false;
 
+	stringstream ss;
 	string status = cust->isLocked() ? "LOCKED" : "UNLOCKED";
-	cout << "Customer Id = " << cust->getId() << endl;
-	cout << "Customer username = " << cust->getUserName() << endl;
-	cout << "Customer First Name = " << cust->getFirstName() << endl;
-	cout << "Customer Last Name = " << cust->getLastName() << endl;
-	cout << "Customer National ID = " << cust->getNationalId() << endl;
-	cout << "Customer Last Name = " << cust->getLastName() << endl;
+	ss << "Customer Id = " << cust->getId() << endl;
+	ss << "Customer username = " << cust->getUserName() << endl;
+	ss << "Customer First Name = " << cust->getFirstName() << endl;
+	ss << "Customer Last Name = " << cust->getLastName() << endl;
+	ss << "Customer National ID = " << cust->getNationalId() << endl;
+	ss << "Customer Last Name = " << cust->getLastName() << endl;
+
+	this->info = ss.str();
 
 	return true;
 }
@@ -121,4 +128,10 @@ void Ui::ui_withdraw() {
 }
 
 void Ui::ui_print_own_customer() {
+
+	cout << endl;
+	cout << m_session->info;
+	m_session->info.clear();
+	cout << endl;
+
 }

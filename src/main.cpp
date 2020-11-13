@@ -11,12 +11,12 @@
 
 using namespace std;
 
-
-void signalHandler( int signum ) {
-   exit(signum);
+void signalHandler(int signum) {
+	exit(signum);
 }
 
 int main(){
+
 	std::signal(SIGINT, signalHandler);
 	Ui *interface = new Ui();
 	return interface->run();

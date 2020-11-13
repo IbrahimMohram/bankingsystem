@@ -199,7 +199,18 @@ bool Session::printCustomerInfo(Customer *customer) {
 	if (!customer)
 		return false;
 
-	// TODO: Implement the printing here
+	stringstream ss;
+	string status = customer->isLocked() ? "LOCKED" : "UNLOCKED";
+	ss << "Customer Id = " << customer->getId() << endl;
+	ss << "Customer username = " << customer->getUserName() << endl;
+	ss << "Customer First Name = " << customer->getFirstName() << endl;
+	ss << "Customer Last Name = " << customer->getLastName() << endl;
+	ss << "Customer National ID = " << customer->getNationalId() << endl;
+	ss << "Customer Last Name = " << customer->getLastName() << endl;
+
+	this->info = ss.str();
+
+	return true;
 
 	return true;
 }
@@ -444,6 +455,21 @@ void Ui::ui_deactivate_customer() {
 }
 
 void Ui::ui_print_customer() {
+
+	string username;
+	cout << "Customer username: ";
+	cin >> username;
+	Customer *cust = m_session->getCustomer(username);
+	if (!cust) {
+		cerr << "No such customer" << endl;
+		exit(-1);
+	}
+
+	m_session->printCustomerInfo(cust);
+	cout << endl;
+	cout << m_session->info;
+	m_session->info.clear();
+	cout << endl;
 }
 
 void Ui::ui_listall_customer() {

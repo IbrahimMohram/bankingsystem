@@ -7,7 +7,7 @@
 
 #include "session.h"
 
-Session::Session() : m_user(nullptr), m_db(nullptr), bIsLoggedIn(false), m_userType(UNKNOWN), m_totalUsers(0) {
+Session::Session() : m_user(nullptr), m_db(nullptr), bIsLoggedIn(false), m_userType(UNKNOWN), m_totalUsers(0), info("") {
 	m_db = new Database();
 	m_sessionCapabilities.clear();
 	m_totalUsers = m_db->getUsersCount();
@@ -237,6 +237,9 @@ void Session::setSessionCapabilities() {
 
 		if (tmpadmin->canDeactivateCustomer())
 			m_sessionCapabilities.push_back("Deactivate Customer");
+
+		if (tmpadmin->canPrintCustomerInfo())
+			m_sessionCapabilities.push_back("Print Customer Information");
 
 		if (tmpadmin->canListAllCustomers())
 			m_sessionCapabilities.push_back("List All Customers");
