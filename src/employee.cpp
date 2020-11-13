@@ -289,9 +289,6 @@ void Ui::ui_create_customer() {
 	string nationalid;
 	string password;
 	string password_confirm;
-	int accountid;
-
-	// TODO: Ask the employee is the account is already created for the customer to be created
 
 	cout << "Registering a new customer" << endl;
 	cout << endl;
@@ -327,16 +324,7 @@ void Ui::ui_create_customer() {
 
 	tmp->lock();
 
-	cout << "Enter Account number: ";
-	cin >> accountid;
-
-	Account *acct = m_session->getAccount(accountid);
-	if (!acct){
-		cerr << "No such account" << endl;
-		exit(-1);
-	}
-
-	tmp->setAccount(acct);
+	tmp->setAccount(nullptr);
 
 	if(!m_session->createCustomer(tmp)) {
 		cerr << "Error creating the customer please contact the an  administrator" << endl;
@@ -470,7 +458,7 @@ void Ui::ui_create_account() {
 	Customer *cust = m_session->getCustomer(customer_name);
 	if (!cust) {
 		cerr << "No such customer" << endl;
-		exit(-1);
+		run();
 	}
 
 	acct->setCustomerId(cust->getId());

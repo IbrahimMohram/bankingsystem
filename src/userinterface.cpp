@@ -229,7 +229,7 @@ int Ui::run() {
 	int operation;
 
 	if (!m_session->isLoggedIn()) {
-		cout << "User: ";
+		cout << "Username: ";
 		cin >> username;
 		password = string(getpass("Password: "));
 
