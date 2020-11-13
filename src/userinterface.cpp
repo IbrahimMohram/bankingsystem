@@ -259,14 +259,28 @@ int Ui::run() {
 
 	for (;;) {
 		operation = 0;
-		//map<int, string>::iterator it;
 
-		do { //FIXME: Infinit loop or crash when string is entered
-			cout << "Select Operation: ";
-			cin >> operation;
-			it = m_capMap.find(operation);
-		} while (cin.fail() && it != m_capMap.end());
+		cout << "Select Operation: ";
+		cin >> operation;
 
+		while (1) {
+			if (cin.fail()) {
+				cin.clear();
+				cin.ignore(numeric_limits<streamsize>::max(),'\n');
+				cout << "Select Operation: ";
+				cin >> operation;
+			}
+			else {
+				it = m_capMap.find(operation);
+				if (it != m_capMap.end()) {
+					break;
+				}
+				else {
+					cout << "Select Operation: ";
+					cin >> operation;
+				}
+			}
+		}
 
 		getCallBack(m_capMap.find(operation)->second);
 		m_execute();
