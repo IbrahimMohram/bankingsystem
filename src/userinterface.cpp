@@ -189,6 +189,10 @@ void Ui::getCallBack(const string desc) {
 
 	if ("Print my customer Information" == desc)
 		m_execute = std::bind(&Ui::ui_print_own_customer, this);
+
+	if ("Print my account Information" == desc)
+			m_execute = std::bind(&Ui::ui_print_own_account, this);
+
 	if ("Transfer money to another Account" == desc)
 		m_execute = std::bind(&Ui::ui_transfer_own, this);
 	if ("Deposit" == desc)

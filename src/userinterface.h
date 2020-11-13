@@ -74,6 +74,7 @@ private:
 	void ui_withdraw();
 
 	void ui_print_own_customer();
+	void ui_print_own_account();
 	void ui_change_password();
 
 public:

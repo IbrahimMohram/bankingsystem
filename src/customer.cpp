@@ -101,15 +101,19 @@ bool Session::printCustomerInfo() {
 
 bool Session::printAccountInfo() {
 
+	stringstream ss;
+
 	Customer *cust = dynamic_cast<Customer*>(m_user);
 	if (!bIsLoggedIn || !cust->getAccount())
 		return false;
 
 	Account *acct = cust->getAccount();
 	string status = acct->isLocked() ? "LOCKED" : "UNLOCKED";
-	cout << "Account Number: " << acct->getId()
+	ss << "Account Number: " << acct->getId()
 			<< ",  Account Balance: " << acct->getBalance()
 			<< ", Status: " << status <<endl;
+
+	this->info = ss.str();
 
 	return true;
 }
@@ -135,4 +139,12 @@ void Ui::ui_print_own_customer() {
 	m_session->info.clear();
 	cout << endl;
 
+}
+
+void Ui::ui_print_own_account() {
+	cout << endl;
+	m_session->printAccountInfo();
+	cout << m_session->info;
+	m_session->info.clear();
+	cout << endl;
 }
